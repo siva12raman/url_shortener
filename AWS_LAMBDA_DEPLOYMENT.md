@@ -56,11 +56,31 @@ export AWS_REGION="us-east-1"
 export AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
 ```
 
-### 1. Create ECR Repository
+### 1. Create ECR Repository & Grant Lambda Access
 ```bash
 aws ecr create-repository \
   --repository-name url-shortener \
   --region ${AWS_REGION}
+
+# Grant AWS Lambda permission to pull container images from ECR
+aws ecr set-repository-policy \
+  --repository-name url-shortener \
+  --policy-text '{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "LambdaECRImageRetrievalPolicy",
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "lambda.amazonaws.com"
+        },
+        "Action": [
+          "ecr:BatchGetImage",
+          "ecr:GetDownloadUrlForLayer"
+        ]
+      }
+    ]
+  }'
 ```
 
 ### 2. Login to ECR
