@@ -56,31 +56,11 @@ export AWS_REGION="us-east-1"
 export AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
 ```
 
-### 1. Create ECR Repository & Grant Lambda Access
+### 1. Create ECR Repository
 ```bash
 aws ecr create-repository \
   --repository-name url-shortener \
   --region ${AWS_REGION}
-
-# Grant AWS Lambda permission to pull container images from ECR
-aws ecr set-repository-policy \
-  --repository-name url-shortener \
-  --policy-text '{
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Sid": "LambdaECRImageRetrievalPolicy",
-        "Effect": "Allow",
-        "Principal": {
-          "Service": "lambda.amazonaws.com"
-        },
-        "Action": [
-          "ecr:BatchGetImage",
-          "ecr:GetDownloadUrlForLayer"
-        ]
-      }
-    ]
-  }'
 ```
 
 ### 2. Login to ECR
@@ -119,10 +99,14 @@ aws iam create-role \
     }]
   }'
 
-# 2. Attach basic execution policy
+# 2. Attach execution and ECR read policies to the role
 aws iam attach-role-policy \
   --role-name url-shortener-lambda-role \
   --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+aws iam attach-role-policy \
+  --role-name url-shortener-lambda-role \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
 
 # 3. Create Lambda Function
 aws lambda create-function \

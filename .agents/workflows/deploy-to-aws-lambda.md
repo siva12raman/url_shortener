@@ -46,25 +46,6 @@ CMD ["gunicorn", "--bind", "0.0.0.0:5001", "--workers", "1", "app:app"]
 aws ecr create-repository \
   --repository-name url-shortener \
   --region us-east-1
-
-aws ecr set-repository-policy \
-  --repository-name url-shortener \
-  --policy-text '{
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Sid": "LambdaECRImageRetrievalPolicy",
-        "Effect": "Allow",
-        "Principal": {
-          "Service": "lambda.amazonaws.com"
-        },
-        "Action": [
-          "ecr:BatchGetImage",
-          "ecr:GetDownloadUrlForLayer"
-        ]
-      }
-    ]
-  }'
 ```
 
 ---
