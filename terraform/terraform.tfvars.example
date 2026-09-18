@@ -1,0 +1,4 @@
+aws_region          = "us-east-1"
+app_name            = "url-shortener"
+lambda_memory_size  = 128
+lambda_architecture = "arm64"
